@@ -16,12 +16,14 @@ Nesse caso, o software está entregue, mas não disponível. Para disponibilizar
 
 ## 2 - Explique o pipeline de entrega
 
-1. Commit Stage | Build - Compilar o código e/ou construir a imagem do docker com o código. Além do binário/docker, também são executados os testes unitários automatizados e análise estática do código.
-2. Teste de Aceitação Automatizado | Test - Rodar os testes de aceitação que são automatizados. São testes que integram os componentes do projeto e testes de UI.
+1. Commit Stage | Build - Compilar o código e/ou construir a imagem do docker com o código. Na teoria, além do binário/docker, também são executados os testes unitários automatizados e análise estática do código.
+2. Teste de Aceitação Automatizado | Test - Rodar os testes de aceitação que são automatizados. São testes que integram os componentes do projeto e testes de UI. No mercado, os testes unitários também são executados no passo de testes.
 3. Homologação | Release - Subir o aretefato em homologação, que é um ambiente que replica produção. Os testes com usuários e/ou QAs são feitos em ambiente de homologação. A ideia é que se está tudo ok em homologação, não haverá problemas em subir o código em produção, já que os dois ambientes devem ser o mais parecidos possível.
 4. Produção | Deploy - Subir a aplicação em produção. Seja automaticamente no Deploy Contínuo ou então liberando manualmente ao apertar um botão.
 
 OBS: Fiquei com um pouco de dúvida nessa divisão.
+
+**Dúvida explicada**: Na literatura, os testes unitários são executados no primeiro passo. No entanto, no mercado, os testes unitários e análise de código são executados no passo de testes/qualidade.
 
 ## 3 - Cite ao menos um padrão de release e sua utilidade
 Um padrão de release que eu tive mais contato foi o Feature Toggle. O Feature Toggle possibilita adicionar código em produção sem liberá-lo para os usuários até que a funcionalidade esteja disponível para uso. Isso facilita disponibilizar funcionalidades sem precisar de um novo deploy apenas para isso.
