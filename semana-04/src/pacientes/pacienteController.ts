@@ -11,14 +11,21 @@ import { encryptPassword } from '../utils/senhaUtils.js'
 import { pacienteSchema } from './pacienteYupSchema.js';
 import { sanitizacaoPaciente } from './pacienteSanitizations.js'
 
-export const consultaPorPaciente = async (
+import { query, validationResult } from 'express-validator'
+
+export const _consultaPorPaciente = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    res.status(400).json({ erros: result.array() });
+  }
+
   const { userInput } = req.query;
-  const query = `SELECT * FROM paciente WHERE nome = ?`;
+  const query_sql = `SELECT * FROM paciente WHERE nome = ?`;
   try {
-    const listaPacientes = await AppDataSource.manager.query(query, [userInput]);
+    const listaPacientes = await AppDataSource.manager.query(query_sql, [userInput]);
     if (listaPacientes.length === 0) {
       res.status(404).json('Paciente não encontrado!');
     } else {
@@ -29,6 +36,15 @@ export const consultaPorPaciente = async (
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 }
+
+export const consultaPorPaciente = [
+  query('userInput')
+    .isString().withMessage('Tipo inválido. O conteúdo do campo não é um texto.')
+    .isLength({ min: 2, max: 80 }).withMessage('Tamanho inválido. O conteúdo do campo deve ter entre 2 e 80 caracteres.')
+    .trim().escape(),
+
+  _consultaPorPaciente
+]
 
 
 export const criarPaciente = async (
