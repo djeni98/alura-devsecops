@@ -13,6 +13,16 @@ import { sanitizacaoPaciente } from './pacienteSanitizations.js'
 
 import { query, validationResult } from 'express-validator'
 
+const _naoTemPadraoSuspeito = async (value: string) => {
+  const padroes = [';', '--', '=', ' is ', '<script>']
+
+  for (let padrao of padroes) {
+    if (value.toLowerCase().includes(padrao)) {
+      throw new Error("Valor inválido")
+    }
+  }
+}
+
 export const _consultaPorPaciente = async (
   req: Request,
   res: Response
@@ -41,6 +51,7 @@ export const consultaPorPaciente = [
   query('userInput')
     .isString().withMessage('Tipo inválido. O conteúdo do campo não é um texto.')
     .isLength({ min: 2, max: 80 }).withMessage('Tamanho inválido. O conteúdo do campo deve ter entre 2 e 80 caracteres.')
+    .custom(_naoTemPadraoSuspeito).withMessage('Texto inválido. O conteúdo do campo não é um texto válido.')
     .trim().escape(),
 
   _consultaPorPaciente
