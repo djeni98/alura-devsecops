@@ -23,6 +23,13 @@ const _naoTemPadraoSuspeito = async (value: string) => {
   }
 }
 
+const _verificaRegexNome = async (value: string) => {
+  // RegEx do sanitizacaoPaciente
+  if (value.match(/[^a-zA-Z-à-ú\s'-]/g)) {
+    throw new Error("Caracteres não aceitos.")
+  }
+}
+
 export const _consultaPorPaciente = async (
   req: Request,
   res: Response
@@ -30,9 +37,11 @@ export const _consultaPorPaciente = async (
   const result = validationResult(req);
   if (!result.isEmpty()) {
     res.status(400).json({ erros: result.array() });
+    return;
   }
 
   const { userInput } = req.query;
+  console.log(`userInput = #${userInput}#`);
   const query_sql = `SELECT * FROM paciente WHERE nome = ?`;
   try {
     const listaPacientes = await AppDataSource.manager.query(query_sql, [userInput]);
@@ -50,8 +59,9 @@ export const _consultaPorPaciente = async (
 export const consultaPorPaciente = [
   query('userInput')
     .isString().withMessage('Tipo inválido. O conteúdo do campo não é um texto.')
+    .custom(_naoTemPadraoSuspeito).withMessage('Texto inválido. O conteúdo do campo não é válido.')
+    .custom(_verificaRegexNome).withMessage('Texto inválido. O conteúdo do campo possui caracteres não permitidos.')
     .isLength({ min: 2, max: 80 }).withMessage('Tamanho inválido. O conteúdo do campo deve ter entre 2 e 80 caracteres.')
-    .custom(_naoTemPadraoSuspeito).withMessage('Texto inválido. O conteúdo do campo não é um texto válido.')
     .trim().escape(),
 
   _consultaPorPaciente
